@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Client creation form</title>
+
+        <link href="https://fonts.googleapis.com/css?family=Playfair+Display" rel="stylesheet">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.6/css/all.css">
+        <link rel="stylesheet" href="./styles.css">
+        
+        <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+        <script src="https://unpkg.com/vuelidate/dist/vuelidate.min.js"></script>
+        <script src="https://unpkg.com/vuelidate/dist/validators.min.js"></script>
+
+    </head>
+    <body>
+        <div id="app">
+            <div class=" center">
+                <div class="col-sm-12 col-md-10 col-lg-7 col-xl-6">
+                    <div class="frame">
+                        <h2 class="header">Client creation form</h2>
+                        <div class="row">
+                            <div class="col-l">
+                                <p class="subheader">Family name*</p>
+                            </div>
+                            <div class="col-r">
+                                <input type="text" v-model="$v.formResponses.surname.$model" :class="status($v.formResponses.surname)">
+                                <transition name="slide-down-fade">
+                                    <div v-if="errors">
+                                        <transition name="slide-down-fade">
+                                            <p class="error text-center" v-if="!$v.formResponses.surname.required">Required field</p>
+                                            <p class="error text-center" v-if="!$v.formResponses.surname.alpha">Letters only field</p>
+                                        </transition>
+                                    </div> 
+                                </transition>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-l">       
+                                <p class="subheader">Given name*</p>
+                            </div>
+                            <div class="col-r">
+                                <input type="text" v-model="$v.formResponses.name.$model" :class="status($v.formResponses.name)">
+                                <transition name="slide-down-fade">
+                                    <div v-if="errors">
+                                        <transition name="slide-down-fade">
+                                            <p class="error text-center" v-if="!$v.formResponses.name.required">Required field</p>
+                                            <p class="error text-center" v-if="!$v.formResponses.name.alpha">Letters only field</p>
+                                        </transition>
+                                    </div>
+                                </transition>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-l">                          
+                                <p class="subheader">Patronymic</p>
+                            </div>
+                            <div class="col-r">
+                                <input type="text" v-model="formResponses.patronymic">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-l">  
+                                <p class="subheader">Date of birth*</p>
+                            </div>
+                            <div class="col-r">   
+                                <input type="text" v-model="$v.formResponses.birthDate.$model" :class="status($v.formResponses.birthDate)">
+                                <br>
+                                <small class="label">Date format DD.MM.YYYY</small>
+                                <transition name="slide-down-fade"> 
+                                    <div v-if="errors">
+                                        <transition name="slide-down-fade">
+                                            <p class="error text-center" v-if="!$v.formResponses.birthDate.required">Required field</p>
+                                        </transition>
+                                        <transition name="slide-down-fade">
+                                            <p class="error text-center" v-if="!$v.formResponses.birthDate.validDate">Date format DD.MM.YYYY</p> 
+                                        </transition>           
+                                    </div>
+                                </transition>
+                            </div> 
+                        </div>
+                        <div class="row">
+                            <div class="col-l">                             
+                                <p class="subheader">Phone number*</p>
+                            </div>
+                            <div class="col-r">
+                                <input v-model="$v.formResponses.phoneNumber.$model" :class="status($v.formResponses.phoneNumber)" @input="acceptNumber">
+                                <br>
+                                <small class="label">Phone number format 7 XXX YYY-TTTT</small> 
+                                <transition name="slide-down-fade">          
+                                    <div v-if="errors">
+                                        <transition name="slide-down-fade">
+                                            <p v-if="!$v.formResponses.phoneNumber.required" class="error text-center">Required field</p>
+                                        </transition>
+                                        <transition name="slide-down-fade">
+                                            <p v-if="!$v.formResponses.phoneNumber.validPhoneNumber" class="error text-center">Phone number starts with 7</p>
+                                        </transition>
+                                    </div>
+                                </transition>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-l">                          
+                                <p class="subheader">Gender</p>
+                            </div>
+                            <div class="col-r">    
+                                <input type="radio" v-model="formResponses.gender" :value="formResponses.genders.man"><label class="label">{{ formResponses.genders.man }}</label>
+                                <input type="radio" v-model="formResponses.gender" :value="formResponses.genders.woman"><label class="label">{{ formResponses.genders.woman }}</label>
+                                <br>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-l">                         
+                                <p class="subheader">Client group*</p>
+                            </div>
+                            <div class="col-r">
+                                <div class="" v-for="(clientGroup, index) in formResponses.clientGroups" :key="index">
+                                    <input type="checkbox" v-model="formResponses.checkedClientGroups" :value="clientGroup"  />
+                                    <label class="label">{{ clientGroup }}</label>
+                                </div>
+                                <transition name="slide-down-fade">
+                                    <div v-if="errors">
+                                        <transition name="slide-down-fade">
+                                            <p class="error text-center" v-if="!$v.formResponses.checkedClientGroups.validClientGroups">Choose a group</p>
+                                        </transition>
+                                    </div> 
+                                </transition> 
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-l"> 
+                                <p class="subheader">Attending doctor</p>
+                            </div>
+                            <div class="col-r">
+                                <select v-model="formResponses.attendingDoctor">
+                                    <option v-for="(attendingDoctor, index2) in formResponses.attendingDoctors" :key="index2">{{ attendingDoctor }}</option>
+                                </select>
+                                <br>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-l"> 
+                                <p class="subheader"></p>
+                            </div>                            
+                            <div class="col-r">
+                                <input type="checkbox" v-model="formResponses.noSMS" :value="formResponses.noSMS"  />
+                                <label class="label">Don't send SMS</label>
+                            </div>
+                        </div>
+                        <h4 class="header">Address</h4>
+                        <div class="row">
+                            <div class="col-l">                         
+                                <p class="subheader">Postcode</p>
+                            </div>
+                            <div class="col-r">
+                                <input type="text" v-model="formResponses.postIndex">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-l">                         
+                                <p class="subheader">Country</p>
+                            </div>
+                            <div class="col-r">
+                                <input type="text" v-model="formResponses.country">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-l"> 
+                                <p class="subheader">Region</p>
+                            </div>
+                            <div class="col-r">
+                                <input type="text" v-model="formResponses.region">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-l"> 
+                                <p class="subheader">City*</p>
+                            </div>
+                            <div class="col-r">
+                                <input type="text" v-model="$v.formResponses.city.$model" :class="status($v.formResponses.city)">
+                                <transition name="slide-down-fade">
+                                    <div v-if="errors">
+                                        <transition name="slide-down-fade">
+                                            <p class="error text-center" v-if="!$v.formResponses.city.required">Required field</p>
+                                            <p class="error text-center" v-if="!$v.formResponses.city.alpha">Letters only field</p>
+                                        </transition>
+                                    </div>
+                                </transition>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-l">
+                                <p class="subheader">Street</p>
+                            </div>
+                            <div class="col-r">
+                                <input type="text" v-model="formResponses.street">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-l">
+                                <p class="subheader">Dwelling </p>
+                            </div>
+                            <div class="col-r">
+                                <input type="text" v-model="formResponses.dwelling">
+                            </div>
+                        </div>
+                        <h4 class="header">Identity document</h4>
+                        <div class="row">
+                            <div class="col-l">
+                                <p class="subheader">Document type*.</p>
+                            </div>
+                            <div class="col-r">
+                                <select v-model="$v.formResponses.document.$model"  :class="status($v.formResponses.document)">
+                                    <option v-for="(document, index3) in formResponses.documents" :key="index3">{{ document }}</option>
+                                </select>
+                                <transition name="slide-down-fade">
+                                    <div v-if="errors">
+                                        <transition name="slide-down-fade"> 
+                                            <p class="error text-center" v-if="!$v.formResponses.document.required">Choose a document</p>
+                                        </transition>  
+                                    </div> 
+                                </transition> 
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-l">                                   
+                                <p class="subheader">Series</p>
+                            </div>
+                            <div class="col-r">
+                                <input type="text" v-model="formResponses.docSeries">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-l"> 
+                                <p class="subheader">Number</p>
+                            </div>
+                            <div class="col-r">
+                                <input type="text" v-model="formResponses.docNumber">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-l"> 
+                                <p class="subheader">Issued by</p>
+                            </div>
+                            <div class="col-r">
+                                <input type="text" v-model="formResponses.docIssuedBy">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-l">                         
+                                <p class="subheader">Issue date*</p>
+                            </div>
+                            <div class="col-r">
+                                <input type="text" v-model="$v.formResponses.docIssueDate.$model" :class="status($v.formResponses.docIssueDate)">
+                                <br>
+                                <small class="label">Date format DD.MM.YYYY</small> 
+                                <transition name="slide-down-fade">
+                                    <div v-if="errors">
+                                        <transition name="slide-down-fade"> 
+                                            <p class="error text-center" v-if="!$v.formResponses.docIssueDate.required">Required field</p>
+                                        </transition>
+                                        <transition name="slide-down-fade">  
+                                            <p class="error text-center" v-if="!$v.formResponses.docIssueDate.validDate">Date format DD.MM.YYYY</p>
+                                        </transition>   
+                                    </div> 
+                                </transition>
+                            </div>
+                        </div>
+                        <br>
+                        <br>
+                     
+                        <div class="row">
+                            <div class="col-l">
+                                <transition name="slide-down-fade">
+                                    <button v-if="uiState !== 'form submitted'" @click.prevent="onSubmit" class="button">Create</button>
+                                </transition>
+                            </div>
+                            <div class="col-r text-center">                           
+                                <transition name="slide-up-fade">
+                                    <p v-if="errors" class="error text-center">Fill up the form!</p>
+                                </transition>                        
+                                <transition name="slide-up-fade">
+                                    <h4 v-if="uiState === 'form submitted'" class="success">The new client successfully created!</h4> 
+                                </transition>  
+                                <!-- <pre class="label">{{ $v }}</pre> -->
+                            </div>
+                        </div>
+                        <transition name="slide-up-fade">  
+                            <div v-if="uiState === 'form submitted'">
+                                <div class="row label">
+                                    <div class="col-l"></div>
+                                    <div class="col-r">
+                                        <p class="header">Data to be processed</p>
+                                    </div>                            
+                                </div>                                
+                                <div class="row label" v-for="(value, name) in formResponses" :key="name">
+                                    <div class="col-l">{{ name }}:</div>
+                                    <div class="col-r">{{ value }}</div>
+                                </div>
+                            </div>                      
+                        </transition>  
+                    </div>                    
+                </div>
+            </div>
+        </div>
+    
+
+        <script type="text/javascript" src="main.js"></script>
+        
+    </body>
+</html>
